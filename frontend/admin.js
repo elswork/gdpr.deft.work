@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadFiles() {
         try {
-            const res = await fetch('http://localhost:3000/api/files');
+            const res = await fetch('/api/files');
             if (!res.ok) throw new Error('Error loading file list');
             const files = await res.json();
             
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (confirm('Are you sure you want to delete this record?')) {
                         const filename = e.target.getAttribute('data-filename');
                         try {
-                            const res = await fetch(`http://localhost:3000/api/files/${filename}`, { method: 'DELETE' });
+                            const res = await fetch(`/api/files/${filename}`, { method: 'DELETE' });
                             if (res.ok) {
                                 loadFiles();
                             } else {
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             decryptStatus.style.color = '#3b82f6';
             
             // 1. Fetch encrypted blob
-            const res = await fetch(`http://localhost:3000/api/files/${currentFile}`);
+            const res = await fetch(`/api/files/${currentFile}`);
             if (!res.ok) throw new Error('Download failed');
             const encryptedBuffer = await res.arrayBuffer();
             

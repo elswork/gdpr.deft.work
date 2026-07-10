@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const fullName = `${jsonData.firstName}_${jsonData.lastName}`.replace(/[^a-zA-Z0-9]/g, '_');
             uploadFormData.append('encryptedFile', encryptedBlob, `registration_${fullName}.enc`);
             
-            const response = await fetch('http://localhost:3000/api/upload', {
+            const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: uploadFormData
             });
