@@ -32,24 +32,37 @@ app.post('/api/upload', upload.single('encryptedFile'), (req, res) => {
     return res.status(400).json({ error: 'No se subió ningún archivo' });
   }
   
-  // Enviar notificación Push mediante ntfy.sh
+  // Enviar notificación Push mediante ntfy.sh usando el módulo https nativo (sin dependencias)
   try {
-    const ntfyUrl = 'https://ntfy.sh/deft_work_gdpr_alerts_hq';
+    const https = require('https');
+    const data = 'Se ha recibido un nuevo formulario cifrado de un miembro del ICE.';
     
-    // Usamos el fetch nativo de Node 18+
-    if (typeof fetch !== 'undefined') {
-      fetch(ntfyUrl, {
-        method: 'POST',
-        body: 'Se ha recibido un nuevo formulario cifrado de un miembro del ICE.',
-        headers: {
-          'Title': 'Nuevo Documento GDPR',
-          'Tags': 'lock,page_facing_up',
-          'Priority': 'default'
-        }
-      }).catch(err => console.error('Error al enviar notificación:', err));
-    }
+    const options = {
+      hostname: 'ntfy.sh',
+      port: 443,
+      path: '/deft_work_gdpr_alerts_hq',
+      method: 'POST',
+      headers: {
+        'Title': 'Nuevo Documento GDPR',
+        'Tags': 'lock,page_facing_up',
+        'Priority': 'default',
+        'Content-Type': 'text/plain',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    };
+
+    const reqNtfy = https.request(options, (resNtfy) => {
+      console.log(`Ntfy response statusCode: ${resNtfy.statusCode}`);
+    });
+
+    reqNtfy.on('error', (error) => {
+      console.error('Error al enviar notificación con ntfy:', error);
+    });
+
+    reqNtfy.write(data);
+    reqNtfy.end();
   } catch (e) {
-    console.error('Fetch no está disponible o falló:', e);
+    console.error('Error general de notificación ntfy:', e);
   }
 
   res.json({ message: 'Archivo subido y guardado de forma segura', filename: req.file.filename });
