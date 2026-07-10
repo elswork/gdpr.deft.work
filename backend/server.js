@@ -31,6 +31,27 @@ app.post('/api/upload', upload.single('encryptedFile'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se subió ningún archivo' });
   }
+  
+  // Enviar notificación Push mediante ntfy.sh
+  try {
+    const ntfyUrl = 'https://ntfy.sh/deft_work_gdpr_alerts_hq';
+    
+    // Usamos el fetch nativo de Node 18+
+    if (typeof fetch !== 'undefined') {
+      fetch(ntfyUrl, {
+        method: 'POST',
+        body: 'Se ha recibido un nuevo formulario cifrado de un miembro del ICE.',
+        headers: {
+          'Title': 'Nuevo Documento GDPR',
+          'Tags': 'lock,page_facing_up',
+          'Priority': 'default'
+        }
+      }).catch(err => console.error('Error al enviar notificación:', err));
+    }
+  } catch (e) {
+    console.error('Fetch no está disponible o falló:', e);
+  }
+
   res.json({ message: 'Archivo subido y guardado de forma segura', filename: req.file.filename });
 });
 
