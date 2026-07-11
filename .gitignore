@@ -4,3 +4,4 @@ uploads/
 backend/uploads/
 .env
 .DS_Store
+nginx-selfsigned.*
