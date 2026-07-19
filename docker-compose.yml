@@ -27,8 +27,6 @@ services:
   gdpr_admin_frontend:
     image: nginx:alpine
     container_name: gdpr_admin_frontend
-    ports:
-      - "3002:443"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gdpr-admin.rule=Host(`admin-gdpr.deft.work`)"
@@ -36,7 +34,5 @@ services:
     volumes:
       - ./admin-frontend:/usr/share/nginx/html:ro
       - ./nginx-admin.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./nginx-selfsigned.crt:/etc/nginx/ssl/nginx-selfsigned.crt:ro
-      - ./nginx-selfsigned.key:/etc/nginx/ssl/nginx-selfsigned.key:ro
     depends_on:
       - gdpr_backend
