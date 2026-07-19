@@ -1,0 +1,7 @@
+host: admin-gdpr.deft.work
+proxy:
+    upstreams:
+        - address: http://192.168.1.75:3002
+ssl:
+    mode: auto
+type: proxy
