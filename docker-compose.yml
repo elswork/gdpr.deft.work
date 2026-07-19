@@ -14,6 +14,8 @@ services:
     image: nginx:alpine
     container_name: gdpr_frontend
     restart: unless-stopped
+    ports:
+      - "3001:80"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gdpr-frontend.rule=Host(`gdpr.deft.work`)"
@@ -27,6 +29,8 @@ services:
   gdpr_admin_frontend:
     image: nginx:alpine
     container_name: gdpr_admin_frontend
+    ports:
+      - "3002:80"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.admin-gdpr-frontend.rule=Host(`admin-gdpr.deft.work`)"
