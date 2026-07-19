@@ -30,4 +30,13 @@ add_res = call_api("/zones/records/add", {
     "ipAddress": LOCAL_IP,
     "ttl": 3600
 })
-print(f"Resultado: {add_res['status']}")
+print(f"Resultado gdpr: {add_res.get('status', add_res)}")
+
+print(f"Añadiendo IP de M2 para admin-gdpr.deft.work en el DNS local...")
+add_res2 = call_api("/zones/records/add", {
+    "domain": "admin-gdpr.deft.work",
+    "type": "A",
+    "ipAddress": LOCAL_IP,
+    "ttl": 3600
+})
+print(f"Resultado admin-gdpr: {add_res2.get('status', add_res2)}")
