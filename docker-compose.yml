@@ -29,8 +29,8 @@ services:
     container_name: gdpr_admin_frontend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gdpr-admin.rule=Host(`admin-gdpr.deft.work`)"
-      - "traefik.http.services.gdpr-admin.loadbalancer.server.port=80"
+      - "traefik.http.routers.admin-gdpr-frontend.rule=Host(`admin-gdpr.deft.work`)"
+      - "traefik.http.services.admin-gdpr-frontend.loadbalancer.server.port=80"
     volumes:
       - ./admin-frontend:/usr/share/nginx/html:ro
       - ./nginx-admin.conf:/etc/nginx/conf.d/default.conf:ro
