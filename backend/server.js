@@ -6,9 +6,43 @@ const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const COOKIE_NAME = 'gdpr_admin_session';
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+function requireAuth(req, res, next) {
+  const cookieHeader = req.headers.cookie || '';
+  const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => {
+    const parts = c.split('=');
+    return [parts[0], parts.slice(1).join('=')];
+  }));
+  
+  if (cookies[COOKIE_NAME] === ADMIN_PASSWORD) {
+    next();
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+}
+
+app.post('/api/login', (req, res) => {
+  const { password } = req.body;
+  if (password === ADMIN_PASSWORD) {
+    // Set cookie valid for 24 hours
+    res.setHeader('Set-Cookie', `${COOKIE_NAME}=${password}; Path=/; HttpOnly; Max-Age=86400`);
+    res.redirect('/');
+  } else {
+    res.redirect('/login.html?error=1');
+  }
+});
+
+app.get('/api/logout', (req, res) => {
+  res.setHeader('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0`);
+  res.redirect('/login.html');
+});
+
 
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -55,7 +89,7 @@ app.post('/api/upload', upload.single('encryptedFile'), (req, res) => {
   res.json({ message: 'Archivo subido y guardado de forma segura', filename: req.file.filename });
 });
 
-app.get('/api/files', (req, res) => {
+app.get('/api/files', requireAuth, (req, res) => {
   fs.readdir(UPLOAD_DIR, (err, files) => {
     if (err) {
       return res.status(500).json({ error: 'No se pudieron listar los archivos' });
@@ -72,7 +106,7 @@ app.get('/api/files', (req, res) => {
   });
 });
 
-app.get('/api/files/:filename', (req, res) => {
+app.get('/api/files/:filename', requireAuth, (req, res) => {
   const filename = req.params.filename;
   if (filename.includes('..') || filename.includes('/')) {
     return res.status(400).send('Invalid filename');
@@ -85,7 +119,7 @@ app.get('/api/files/:filename', (req, res) => {
   }
 });
 
-app.delete('/api/files/:filename', (req, res) => {
+app.delete('/api/files/:filename', requireAuth, (req, res) => {
   const filename = req.params.filename;
   if (filename.includes('..') || filename.includes('/')) {
     return res.status(400).send('Invalid filename');

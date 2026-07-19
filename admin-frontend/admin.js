@@ -76,6 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadFiles() {
         try {
             const res = await fetch('/api/files');
+            if (res.status === 401) {
+                window.location.href = 'login.html';
+                return;
+            }
             if (!res.ok) throw new Error('Error loading file list');
             const files = await res.json();
             
